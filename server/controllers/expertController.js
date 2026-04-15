@@ -195,4 +195,28 @@ const getRecommendedExperts = async (req, res) => {
   }
 };
 
-module.exports = { createProfile, getAllExperts, getExpertById, updateProfile, getRecommendedExperts };
+// @route  POST /experts/:id/photo
+// @access Private (own profile)
+const uploadPhoto = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: 'No image file provided' });
+    }
+
+    const profile = await ExpertProfile.findOne({ _id: req.params.id, userId: req.user._id });
+    if (!profile) {
+      return res.status(404).json({ message: 'Profile not found or unauthorized' });
+    }
+
+    // req.file.path is the Cloudinary URL after upload
+    profile.photoUrl = req.file.path;
+    await profile.save();
+
+    res.json({ message: 'Photo uploaded successfully', photoUrl: profile.photoUrl });
+  } catch (error) {
+    res.status(500).json({ message: 'Upload failed', error: error.message });
+  }
+};
+
+module.exports = { createProfile, getAllExperts, getExpertById, updateProfile, getRecommendedExperts, uploadPhoto };
+

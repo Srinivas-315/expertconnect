@@ -45,6 +45,10 @@ const expertProfileSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    photoUrl: {
+      type: String,
+      default: '',
+    },
   },
   { timestamps: true }
 );

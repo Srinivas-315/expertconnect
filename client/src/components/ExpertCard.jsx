@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import StarRating from './StarRating';
 
 const ExpertCard = ({ expert }) => {
-  const { _id, userId, skills, experience, bio, hourlyRate, category, avgRating, totalReviews } = expert;
+  const { _id, userId, skills, experience, bio, hourlyRate, category, avgRating, totalReviews, photoUrl } = expert;
   const name = userId?.name || 'Expert';
 
   const initials = name
@@ -16,9 +16,13 @@ const ExpertCard = ({ expert }) => {
     <div className="card flex flex-col gap-4">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
-          {initials}
-        </div>
+        {photoUrl ? (
+          <img src={photoUrl} alt={name} className="w-12 h-12 rounded-full object-cover flex-shrink-0 border-2 border-blue-100" />
+        ) : (
+          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
+            {initials}
+          </div>
+        )}
         <div>
           <h3 className="font-semibold text-gray-900">{name}</h3>
           <span className="text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">{category}</span>

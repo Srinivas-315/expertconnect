@@ -6,8 +6,10 @@ const {
   getExpertById,
   updateProfile,
   getRecommendedExperts,
+  uploadPhoto,
 } = require('../controllers/expertController');
 const { protect, authorizeRole } = require('../middleware/auth');
+const upload = require('../middleware/upload');
 
 // GET  /experts        — Public
 router.get('/', getAllExperts);
@@ -23,5 +25,8 @@ router.post('/create', protect, authorizeRole('expert'), createProfile);
 
 // PUT  /experts/:id    — Private (own profile)
 router.put('/:id', protect, authorizeRole('expert'), updateProfile);
+
+// POST /experts/:id/photo — Private (upload profile photo)
+router.post('/:id/photo', protect, authorizeRole('expert'), upload.single('photo'), uploadPhoto);
 
 module.exports = router;
