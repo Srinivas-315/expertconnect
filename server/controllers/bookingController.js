@@ -62,12 +62,10 @@ const requestBooking = async (req, res) => {
       bookingId: booking._id,
     };
 
-    // Email to client — booking submitted
-    sendEmail(sendBookingConfirmation, emailData);
-
-    // Email to expert — new booking alert
+    // 📧 Send emails (awaited so Vercel doesn't kill them)
+    await sendEmail(sendBookingConfirmation, emailData);
     if (expertUser?.email) {
-      sendEmail(sendNewBookingAlert, emailData);
+      await sendEmail(sendNewBookingAlert, emailData);
     }
 
     res.status(201).json({ message: 'Booking request sent successfully', booking });
@@ -160,9 +158,9 @@ const updateBookingStatus = async (req, res) => {
     };
 
     if (isConfirmed) {
-      sendEmail(sendBookingAccepted, emailBase);
+      await sendEmail(sendBookingAccepted, emailBase);
     } else if (isRejected) {
-      sendEmail(sendBookingRejected, emailBase);
+      await sendEmail(sendBookingRejected, emailBase);
     }
 
     res.json({ message: 'Booking status updated', booking });
