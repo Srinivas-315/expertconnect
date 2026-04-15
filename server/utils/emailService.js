@@ -2,6 +2,9 @@ const { Resend } = require('resend');
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+// ── App URL — fallback to production URL if CLIENT_URL not set ─
+const APP_URL = process.env.CLIENT_URL || 'https://expertconnect-93ye.vercel.app';
+
 // ── Shared brand colors ─────────────────────────────────────
 const PRIMARY = '#2563EB';   // blue-600
 const DARK    = '#1E293B';   // slate-800
@@ -91,7 +94,7 @@ const sendBookingConfirmation = async ({ clientEmail, clientName, expertName, ca
     ])}
 
     <p style="color:#475569;font-size:14px;">You'll receive another email when the expert accepts or declines.</p>
-    ${btn('View Booking', `${process.env.CLIENT_URL}/dashboard`)}
+    ${btn('View Booking', `${APP_URL}/dashboard`)}
   `);
 
   return resend.emails.send({
@@ -120,7 +123,7 @@ const sendNewBookingAlert = async ({ expertEmail, expertName, clientName, catego
     ])}
 
     <p style="color:#475569;font-size:14px;font-weight:600;">⚡ Please respond within 24 hours to keep your response rate high.</p>
-    ${btn('Accept or Decline →', `${process.env.CLIENT_URL}/dashboard`)}
+    ${btn('Accept or Decline →', `${APP_URL}/dashboard`)}
   `);
 
   return resend.emails.send({
@@ -151,7 +154,7 @@ const sendBookingAccepted = async ({ clientEmail, clientName, expertName, catego
     ])}
 
     <p style="color:#475569;font-size:14px;">You can now chat with your expert directly on ExpertConnect.</p>
-    ${btn('Open Chat →', `${process.env.CLIENT_URL}/dashboard`)}
+    ${btn('Open Chat →', `${APP_URL}/dashboard`)}
   `);
 
   return resend.emails.send({
@@ -179,7 +182,7 @@ const sendBookingRejected = async ({ clientEmail, clientName, expertName, catego
       </p>
     </div>
 
-    ${btn('Find Another Expert →', `${process.env.CLIENT_URL}/experts?category=${encodeURIComponent(category)}`)}
+    ${btn('Find Another Expert →', `${APP_URL}/experts?category=${encodeURIComponent(category)}`)}
   `);
 
   return resend.emails.send({
@@ -210,7 +213,7 @@ const sendPaymentSuccess = async ({ clientEmail, clientName, expertName, amount,
     ])}
 
     <p style="color:#475569;font-size:14px;">A copy of this receipt has been saved to your account.</p>
-    ${btn('View Dashboard', `${process.env.CLIENT_URL}/dashboard`)}
+    ${btn('View Dashboard', `${APP_URL}/dashboard`)}
   `);
 
   return resend.emails.send({
