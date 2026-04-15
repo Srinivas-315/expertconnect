@@ -1,10 +1,10 @@
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
-import { io } from 'socket.io-client';
 import { useAuth } from './AuthContext';
 
 const SocketContext = createContext(null);
 
-const SOCKET_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+// Socket.io only works in local development (not on Vercel serverless)
+const IS_PRODUCTION = import.meta.env.PROD;
 
 export const SocketProvider = ({ children }) => {
   const { user } = useAuth();
@@ -12,8 +12,9 @@ export const SocketProvider = ({ children }) => {
   const [notifications, setNotifications] = useState([]);
 
   useEffect(() => {
+    // Skip Socket.io entirely in production — Vercel serverless doesn't support WebSockets
+    if (IS_PRODUCTION) return;
     if (!user) {
-      // Disconnect if user logs out
       if (socketRef.current) {
         socketRef.current.disconnect();
         socketRef.current = null;
@@ -21,38 +22,39 @@ export const SocketProvider = ({ children }) => {
       return;
     }
 
-    // Create socket connection
-    const socket = io(SOCKET_URL, { transports: ['websocket'] });
-    socketRef.current = socket;
+    // Dynamically import socket.io-client only in development
+    import('socket.io-client').then(({ io }) => {
+      const SOCKET_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const socket = io(SOCKET_URL, {
+        transports: ['websocket', 'polling'],
+        reconnectionAttempts: 3,
+        timeout: 5000,
+      });
+      socketRef.current = socket;
 
-    socket.on('connect', () => {
-      // Register this user's socket with the server
-      socket.emit('register', user._id || user.id);
-    });
+      socket.on('connect', () => {
+        socket.emit('register', user._id || user.id);
+      });
 
-    // ── Listen for incoming notifications ──────────────────
-    socket.on('notification', (data) => {
-      const newNotif = {
-        id: Date.now(),
-        ...data,
-        read: false,
-        time: new Date(),
-      };
-      setNotifications((prev) => [newNotif, ...prev].slice(0, 20)); // keep max 20
+      socket.on('notification', (data) => {
+        const newNotif = { id: Date.now(), ...data, read: false, time: new Date() };
+        setNotifications((prev) => [newNotif, ...prev].slice(0, 20));
+      });
     });
 
     return () => {
-      socket.disconnect();
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+        socketRef.current = null;
+      }
     };
   }, [user]);
 
-  const markAllRead = () => {
+  const markAllRead = () =>
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-  };
 
-  const clearNotification = (id) => {
+  const clearNotification = (id) =>
     setNotifications((prev) => prev.filter((n) => n.id !== id));
-  };
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
