@@ -4,7 +4,7 @@ const dotenv = require('dotenv');
 const connectDB = require('./config/db');
 
 dotenv.config();
-connectDB();
+// Note: connectDB is called per-request in middleware below (serverless-safe)
 
 const app = express();
 
@@ -24,6 +24,18 @@ app.use(cors({
   credentials: true,
 }));
 app.use(express.json());
+
+// ── Connect DB on every request (serverless-safe connection caching) ──
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    console.error('DB connection error:', err.message);
+    res.status(503).json({ message: 'Database unavailable. Please try again.', error: err.message });
+  }
+});
+
 
 // ── REST Routes ────────────────────────────────────────────
 app.use('/auth',     require('./routes/auth'));
