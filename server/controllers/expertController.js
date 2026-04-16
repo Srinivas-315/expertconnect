@@ -20,12 +20,13 @@ const createProfile = async (req, res) => {
       bio,
       hourlyRate,
       category: category || 'General',
+      isApproved: false, // Requires admin approval
     });
 
     // Populate user info
     await profile.populate('userId', 'name email');
 
-    res.status(201).json({ message: 'Expert profile created', profile });
+    res.status(201).json({ message: 'Expert profile submitted for admin approval', profile });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
@@ -37,7 +38,8 @@ const getAllExperts = async (req, res) => {
   try {
     const { search, category, minRate, maxRate } = req.query;
 
-    let filter = { available: true };
+    // Only show publicly approved expert profiles
+    let filter = { available: true, isApproved: true };
 
     if (category) filter.category = category;
     if (minRate || maxRate) {

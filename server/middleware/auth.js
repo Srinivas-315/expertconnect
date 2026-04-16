@@ -21,6 +21,10 @@ const protect = async (req, res, next) => {
     if (!req.user) {
       return res.status(401).json({ message: 'User not found' });
     }
+    // Block banned users on every protected request
+    if (req.user.isBanned) {
+      return res.status(403).json({ message: 'Your account has been banned. Contact support.' });
+    }
     next();
   } catch (error) {
     return res.status(401).json({ message: 'Not authorized, token invalid' });
@@ -39,4 +43,12 @@ const authorizeRole = (...roles) => {
   };
 };
 
-module.exports = { protect, authorizeRole };
+// Middleware to restrict to admin role only
+const isAdmin = (req, res, next) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ message: 'Admin access required' });
+  }
+  next();
+};
+
+module.exports = { protect, authorizeRole, isAdmin };

@@ -70,6 +70,10 @@ const login = async (req, res) => {
       return res.status(401).json({ message: 'Invalid email or password' });
     }
 
+    // Block banned users
+    if (user.isBanned) {
+      return res.status(403).json({ message: 'Your account has been banned. Please contact support.' });
+    }
     const token = generateToken(user._id);
 
     res.json({

@@ -43,6 +43,7 @@ app.use('/experts',  require('./routes/experts'));
 app.use('/booking',  require('./routes/bookings'));
 app.use('/messages', require('./routes/messages'));
 app.use('/reviews',  require('./routes/reviews'));
+app.use('/admin',    require('./routes/admin'));
 
 // ── Health check ───────────────────────────────────────────
 app.get('/', (req, res) => {

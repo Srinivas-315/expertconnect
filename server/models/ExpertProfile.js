@@ -49,6 +49,18 @@ const expertProfileSchema = new mongoose.Schema(
       type: String,
       default: '',
     },
+    isApproved: {
+      type: Boolean,
+      default: true,  // true = backward-compat for existing profiles
+    },
+    isRejected: {
+      type: Boolean,
+      default: false,
+    },
+    rejectionReason: {
+      type: String,
+      default: '',
+    },
   },
   { timestamps: true }
 );

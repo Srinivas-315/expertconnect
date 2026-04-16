@@ -33,6 +33,12 @@ const Navbar = () => {
                 Dashboard
               </Link>
             )}
+            {user?.role === 'admin' && (
+              <Link to="/admin" className="text-violet-600 hover:text-violet-700 font-semibold transition-colors flex items-center gap-1">
+                <span className="w-5 h-5 bg-violet-600 rounded text-white text-xs flex items-center justify-center font-bold">A</span>
+                Admin
+              </Link>
+            )}
           </div>
 
           {/* Auth + Bell */}

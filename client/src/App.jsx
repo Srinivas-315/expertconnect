@@ -14,6 +14,7 @@ import Experts from './pages/Experts';
 import ExpertDetail from './pages/ExpertDetail';
 import Dashboard from './pages/Dashboard';
 import Chat from './pages/Chat';
+import AdminPanel from './pages/AdminPanel';
 
 function App() {
   // Auto-update service worker when new version is deployed
@@ -44,6 +45,14 @@ function App() {
                   element={
                     <ProtectedRoute>
                       <Chat />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin"
+                  element={
+                    <ProtectedRoute>
+                      <AdminPanel />
                     </ProtectedRoute>
                   }
                 />
